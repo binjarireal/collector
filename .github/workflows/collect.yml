@@ -1,0 +1,54 @@
+# 평일 출퇴근 시간 경기도 광역버스 남은 좌석 수집 (490개 노선, 2분 간격)
+# - 아침: 05:00 KST에 띄워 06:00~09:00 수집 / 저녁: 16:00 KST에 띄워 17:00~20:00 수집
+#   (GitHub 예약 실행이 수십 분 늦게 뜨는 경우가 있어 1시간 일찍 띄움 — 공개 저장소라 실행 시간 제한 없음)
+# - 키: 저장소 Secrets 의 DATA_GO_KR_KEY
+# - 결과: data/YYYYMMDD_HHMM.csv.gz 를 끝나면 커밋
+name: collect
+
+on:
+  schedule:
+    - cron: "0 20 * * 0-4"   # UTC 일~목 20:00 = KST 월~금 05:00 (아침)
+    - cron: "0 7 * * 1-5"    # UTC 월~금 07:00 = KST 월~금 16:00 (저녁)
+  workflow_dispatch:
+    inputs:
+      minutes:
+        description: "시험: 지금 바로 몇 분 수집"
+        default: "3"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: collect-${{ github.event.schedule || 'manual' }}
+  cancel-in-progress: false
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    env:
+      TZ: Asia/Seoul
+      DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: 수집
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            python collect.py --start now --minutes "${{ inputs.minutes }}"
+          elif [ "${{ github.event.schedule }}" = "0 20 * * 0-4" ]; then
+            python collect.py --start 06:00 --end 09:00
+          else
+            python collect.py --start 17:00 --end 20:00
+          fi
+      - name: 결과 저장
+        if: always()
+        run: |
+          git config user.name "collect-bot"
+          git config user.email "collect-bot@users.noreply.github.com"
+          git add data
+          git diff --cached --quiet && echo "새 기록 없음" && exit 0
+          git commit -m "수집 $(date +%Y-%m-%d\ %H:%M)"
+          for i in 1 2 3; do git pull --rebase && git push && break; sleep 5; done
