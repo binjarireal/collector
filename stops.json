@@ -1,0 +1,907 @@
+{
+ "_note": "정류장 도착정보 수집 대상(2026-10-18 수정). 2025-09·10·12 평일 경기도 광역버스 승하차 승차량 순. am=출근 06:00~09:00 경기 125곳(61회), pm=퇴근 17:30~19:30 서울 55곳(41회), 3분 → 하루 9,880회",
+ "am": [
+  {
+   "stationId": "203000157",
+   "name": "살구골동아아파트",
+   "avgBoard": 1034
+  },
+  {
+   "stationId": "206000532",
+   "name": "판교역.낙생육교.현대백화점",
+   "avgBoard": 922
+  },
+  {
+   "stationId": "209000135",
+   "name": "롯데백화점.범계역",
+   "avgBoard": 760
+  },
+  {
+   "stationId": "226000039",
+   "name": "의왕톨게이트",
+   "avgBoard": 719
+  },
+  {
+   "stationId": "203000450",
+   "name": "살구골.서광아파트",
+   "avgBoard": 625
+  },
+  {
+   "stationId": "200000080",
+   "name": "한일타운.경기일보.홈플러스",
+   "avgBoard": 576
+  },
+  {
+   "stationId": "233001224",
+   "name": "다은마을(중)",
+   "avgBoard": 541
+  },
+  {
+   "stationId": "233000374",
+   "name": "창의고",
+   "avgBoard": 540
+  },
+  {
+   "stationId": "205000207",
+   "name": "모란역(광역.시외버스)",
+   "avgBoard": 540
+  },
+  {
+   "stationId": "206000040",
+   "name": "오리역",
+   "avgBoard": 516
+  },
+  {
+   "stationId": "222000149",
+   "name": "중흥아파트",
+   "avgBoard": 506
+  },
+  {
+   "stationId": "233003132",
+   "name": "호수자이파밀리에.아이원",
+   "avgBoard": 489
+  },
+  {
+   "stationId": "233001450",
+   "name": "솔빛마을.화성동탄중앙도서관",
+   "avgBoard": 468
+  },
+  {
+   "stationId": "203000122",
+   "name": "청명역3번출구",
+   "avgBoard": 456
+  },
+  {
+   "stationId": "228000682",
+   "name": "기흥역",
+   "avgBoard": 448
+  },
+  {
+   "stationId": "222000243",
+   "name": "두산1차아파트",
+   "avgBoard": 445
+  },
+  {
+   "stationId": "233001448",
+   "name": "나루마을.월드반도",
+   "avgBoard": 444
+  },
+  {
+   "stationId": "233001219",
+   "name": "메타폴리스(중)",
+   "avgBoard": 435
+  },
+  {
+   "stationId": "203000120",
+   "name": "황골벽산아파트",
+   "avgBoard": 428
+  },
+  {
+   "stationId": "225000047",
+   "name": "산본역",
+   "avgBoard": 419
+  },
+  {
+   "stationId": "200000187",
+   "name": "수원종합운동장.수원시체육회관.아너스빌위즈",
+   "avgBoard": 418
+  },
+  {
+   "stationId": "202000053",
+   "name": "우만동4단지",
+   "avgBoard": 416
+  },
+  {
+   "stationId": "228000700",
+   "name": "청현마을.수원신갈IC",
+   "avgBoard": 415
+  },
+  {
+   "stationId": "218000317",
+   "name": "행신초등학교(중)",
+   "avgBoard": 412
+  },
+  {
+   "stationId": "228000680",
+   "name": "상미마을.신갈오거리.롯데캐슬레이시티",
+   "avgBoard": 405
+  },
+  {
+   "stationId": "235001491",
+   "name": "연푸른초교.한신더휴.e편한세상19단지",
+   "avgBoard": 395
+  },
+  {
+   "stationId": "227000282",
+   "name": "미사강변2차푸르지오.센트리버",
+   "avgBoard": 389
+  },
+  {
+   "stationId": "235000860",
+   "name": "e편한세상11단지.경기교통공사",
+   "avgBoard": 387
+  },
+  {
+   "stationId": "206000087",
+   "name": "미금역.청솔마을.2001아울렛",
+   "avgBoard": 363
+  },
+  {
+   "stationId": "206000613",
+   "name": "이매촌한신.서현역.AK프라자",
+   "avgBoard": 353
+  },
+  {
+   "stationId": "233001696",
+   "name": "호수부영1차",
+   "avgBoard": 351
+  },
+  {
+   "stationId": "224000948",
+   "name": "배곧중심상가",
+   "avgBoard": 349
+  },
+  {
+   "stationId": "206000725",
+   "name": "정자역",
+   "avgBoard": 348
+  },
+  {
+   "stationId": "200000186",
+   "name": "수원KT위즈파크.경기도청소년활동진흥상담복지센터",
+   "avgBoard": 346
+  },
+  {
+   "stationId": "218000316",
+   "name": "고양경찰서.토당청소년수련관(중)",
+   "avgBoard": 331
+  },
+  {
+   "stationId": "200000104",
+   "name": "성균관대역.고용노동부경기지청.율전성당",
+   "avgBoard": 330
+  },
+  {
+   "stationId": "233003093",
+   "name": "호수부영3차.우미린2차",
+   "avgBoard": 330
+  },
+  {
+   "stationId": "203000399",
+   "name": "광교중앙.경기도청.아주대역환승센터",
+   "avgBoard": 329
+  },
+  {
+   "stationId": "228000683",
+   "name": "수원컨트리클럽",
+   "avgBoard": 319
+  },
+  {
+   "stationId": "233001562",
+   "name": "한빛마을(중)",
+   "avgBoard": 317
+  },
+  {
+   "stationId": "233000129",
+   "name": "신안2차.반도4차",
+   "avgBoard": 316
+  },
+  {
+   "stationId": "207000007",
+   "name": "장암주공5단지앞",
+   "avgBoard": 314
+  },
+  {
+   "stationId": "226000038",
+   "name": "의왕톨게이트",
+   "avgBoard": 307
+  },
+  {
+   "stationId": "233000121",
+   "name": "상록.테크노밸리.GS자이",
+   "avgBoard": 299
+  },
+  {
+   "stationId": "226000191",
+   "name": "의왕청계영업소",
+   "avgBoard": 297
+  },
+  {
+   "stationId": "213000393",
+   "name": "KTX광명역5번출구",
+   "avgBoard": 294
+  },
+  {
+   "stationId": "235000602",
+   "name": "회암초.옥정3단지.디에트르에듀포레.린파밀리에",
+   "avgBoard": 287
+  },
+  {
+   "stationId": "206000299",
+   "name": "서현역.AK플라자",
+   "avgBoard": 285
+  },
+  {
+   "stationId": "206000535",
+   "name": "판교역.낙생육교.현대백화점",
+   "avgBoard": 282
+  },
+  {
+   "stationId": "200000092",
+   "name": "화서역파크뷰.삼환나우빌.효성아파트",
+   "avgBoard": 281
+  },
+  {
+   "stationId": "228001003",
+   "name": "보정동행정복지센터",
+   "avgBoard": 280
+  },
+  {
+   "stationId": "219000370",
+   "name": "마두역(중)",
+   "avgBoard": 280
+  },
+  {
+   "stationId": "233001614",
+   "name": "한신더휴",
+   "avgBoard": 274
+  },
+  {
+   "stationId": "200000120",
+   "name": "동신아파트",
+   "avgBoard": 270
+  },
+  {
+   "stationId": "219000163",
+   "name": "백석동.요진와이시티(중)",
+   "avgBoard": 270
+  },
+  {
+   "stationId": "211000269",
+   "name": "송내역남부(광역버스)",
+   "avgBoard": 269
+  },
+  {
+   "stationId": "200000111",
+   "name": "정자3동행정복지센터.정자동중심상가",
+   "avgBoard": 268
+  },
+  {
+   "stationId": "201000244",
+   "name": "호매실역서희스타힐스.금곡LG2단지",
+   "avgBoard": 266
+  },
+  {
+   "stationId": "201000118",
+   "name": "수원아이파크시티.선일초교",
+   "avgBoard": 265
+  },
+  {
+   "stationId": "207000085",
+   "name": "신동초.신동아파밀리에아파트앞",
+   "avgBoard": 265
+  },
+  {
+   "stationId": "208000158",
+   "name": "안양시외버스정류소.교보생명.댕리단길",
+   "avgBoard": 264
+  },
+  {
+   "stationId": "233002429",
+   "name": "이주택지.상록.경남아파트",
+   "avgBoard": 259
+  },
+  {
+   "stationId": "203000071",
+   "name": "광교호수공원입구.원천교사거리",
+   "avgBoard": 256
+  },
+  {
+   "stationId": "228000157",
+   "name": "두산위브더제니스.호수마을.자연엔데시앙",
+   "avgBoard": 254
+  },
+  {
+   "stationId": "235000948",
+   "name": "디에트르프레스티지.리젠시빌란트",
+   "avgBoard": 253
+  },
+  {
+   "stationId": "234000451",
+   "name": "태재고개",
+   "avgBoard": 252
+  },
+  {
+   "stationId": "228000685",
+   "name": "어정삼거리.강남마을",
+   "avgBoard": 250
+  },
+  {
+   "stationId": "206000007",
+   "name": "운중중학교",
+   "avgBoard": 247
+  },
+  {
+   "stationId": "206000157",
+   "name": "야탑역.종합버스터미널(전면)",
+   "avgBoard": 246
+  },
+  {
+   "stationId": "228000967",
+   "name": "LG빌리지5차",
+   "avgBoard": 245
+  },
+  {
+   "stationId": "228000911",
+   "name": "한성아파트.한국아파트.현대1차아파트",
+   "avgBoard": 243
+  },
+  {
+   "stationId": "235000392",
+   "name": "덕현초교.덕고개",
+   "avgBoard": 241
+  },
+  {
+   "stationId": "202000088",
+   "name": "수원역",
+   "avgBoard": 239
+  },
+  {
+   "stationId": "203000123",
+   "name": "영통역",
+   "avgBoard": 239
+  },
+  {
+   "stationId": "231001341",
+   "name": "공도시외버스정류장",
+   "avgBoard": 238
+  },
+  {
+   "stationId": "233000979",
+   "name": "포스코더샵.롯데캐슬",
+   "avgBoard": 230
+  },
+  {
+   "stationId": "200000119",
+   "name": "북수원자이렉스비아정문",
+   "avgBoard": 228
+  },
+  {
+   "stationId": "224001001",
+   "name": "한라비발디1차",
+   "avgBoard": 225
+  },
+  {
+   "stationId": "228000883",
+   "name": "동천동현대홈타운2차아파트",
+   "avgBoard": 225
+  },
+  {
+   "stationId": "228001005",
+   "name": "꽃메마을.새에덴교회",
+   "avgBoard": 221
+  },
+  {
+   "stationId": "203000116",
+   "name": "금성아파트.한국2차아파트",
+   "avgBoard": 219
+  },
+  {
+   "stationId": "206000316",
+   "name": "이매촌한신.서현역.AK프라자",
+   "avgBoard": 217
+  },
+  {
+   "stationId": "206000278",
+   "name": "롯데백화점.수내역",
+   "avgBoard": 216
+  },
+  {
+   "stationId": "229001501",
+   "name": "새암공원",
+   "avgBoard": 216
+  },
+  {
+   "stationId": "233000978",
+   "name": "한화.린스트라우스",
+   "avgBoard": 214
+  },
+  {
+   "stationId": "200000130",
+   "name": "SK스카이뷰.SK아트리움",
+   "avgBoard": 212
+  },
+  {
+   "stationId": "226000190",
+   "name": "의왕청계영업소",
+   "avgBoard": 212
+  },
+  {
+   "stationId": "206000555",
+   "name": "판교유스센터.판교종합사회복지관",
+   "avgBoard": 211
+  },
+  {
+   "stationId": "206000004",
+   "name": "판교원마을1.2단지.판교도서관",
+   "avgBoard": 209
+  },
+  {
+   "stationId": "202000247",
+   "name": "엘지아파트.금강아파트",
+   "avgBoard": 209
+  },
+  {
+   "stationId": "210000327",
+   "name": "상동역1번출구.부천터미널소풍.홈플러스",
+   "avgBoard": 208
+  },
+  {
+   "stationId": "277104181",
+   "name": "남산1호터널TG(미정차)",
+   "avgBoard": 208
+  },
+  {
+   "stationId": "224000703",
+   "name": "목감호반더레이크",
+   "avgBoard": 207
+  },
+  {
+   "stationId": "234000053",
+   "name": "수레실.오포롯데캐슬",
+   "avgBoard": 206
+  },
+  {
+   "stationId": "222000160",
+   "name": "호만마을.호평중흥아파트",
+   "avgBoard": 202
+  },
+  {
+   "stationId": "206000006",
+   "name": "운중동행정복지센터",
+   "avgBoard": 201
+  },
+  {
+   "stationId": "228000737",
+   "name": "쌍용아파트.현대1차.신창미션힐",
+   "avgBoard": 200
+  },
+  {
+   "stationId": "234000333",
+   "name": "동성.현대아파트.대광로제비앙아파트",
+   "avgBoard": 200
+  },
+  {
+   "stationId": "209000110",
+   "name": "안양우편물류센터",
+   "avgBoard": 199
+  },
+  {
+   "stationId": "228000950",
+   "name": "풍덕천2동행정복지센터.현대성우아파트",
+   "avgBoard": 196
+  },
+  {
+   "stationId": "216000122",
+   "name": "상록수역앞",
+   "avgBoard": 195
+  },
+  {
+   "stationId": "233002421",
+   "name": "예솔초.호반2차.대원2차",
+   "avgBoard": 194
+  },
+  {
+   "stationId": "200000091",
+   "name": "풍림아파트",
+   "avgBoard": 193
+  },
+  {
+   "stationId": "233000161",
+   "name": "반도3차.금강1차",
+   "avgBoard": 193
+  },
+  {
+   "stationId": "200000146",
+   "name": "삼익아파트.광교산입구",
+   "avgBoard": 192
+  },
+  {
+   "stationId": "234000452",
+   "name": "현대모닝사이드1차아파트.새마을입구.신현리",
+   "avgBoard": 192
+  },
+  {
+   "stationId": "234000332",
+   "name": "쌍령동.김촌말.센트럴푸르지오아파트",
+   "avgBoard": 191
+  },
+  {
+   "stationId": "228002018",
+   "name": "서수지IC입구",
+   "avgBoard": 191
+  },
+  {
+   "stationId": "232000743",
+   "name": "전원마을1단지.김포한강롯데캐슬",
+   "avgBoard": 189
+  },
+  {
+   "stationId": "200000075",
+   "name": "경기도인재개발원.연구원.평생교육진흥원.여성가족재단",
+   "avgBoard": 188
+  },
+  {
+   "stationId": "231000322",
+   "name": "한경국립대학교",
+   "avgBoard": 187
+  },
+  {
+   "stationId": "233002443",
+   "name": "한미약품.푸르지오",
+   "avgBoard": 187
+  },
+  {
+   "stationId": "201000210",
+   "name": "평생교육학습관.남수원중학교",
+   "avgBoard": 186
+  },
+  {
+   "stationId": "207000534",
+   "name": "산들마을2단지",
+   "avgBoard": 186
+  },
+  {
+   "stationId": "219000192",
+   "name": "강선마을(중)",
+   "avgBoard": 185
+  },
+  {
+   "stationId": "228001972",
+   "name": "신봉센트레빌1단지.광교산자이",
+   "avgBoard": 183
+  },
+  {
+   "stationId": "203000069",
+   "name": "KT동수원지사",
+   "avgBoard": 183
+  },
+  {
+   "stationId": "228001034",
+   "name": "수지지역난방공사",
+   "avgBoard": 182
+  },
+  {
+   "stationId": "233000786",
+   "name": "봉담읍행정복지센터",
+   "avgBoard": 182
+  },
+  {
+   "stationId": "228000747",
+   "name": "동원로얄듀크.용인등기소",
+   "avgBoard": 181
+  },
+  {
+   "stationId": "236000514",
+   "name": "주공2단지석향마을",
+   "avgBoard": 181
+  },
+  {
+   "stationId": "222001599",
+   "name": "보학마을.라온프라이빗아파트",
+   "avgBoard": 181
+  },
+  {
+   "stationId": "222001955",
+   "name": "금강펜테리움2차.반도유보라.신안인스빌",
+   "avgBoard": 180
+  },
+  {
+   "stationId": "203000063",
+   "name": "삼성1차아파트",
+   "avgBoard": 180
+  },
+  {
+   "stationId": "232000356",
+   "name": "고촌역",
+   "avgBoard": 78
+  }
+ ],
+ "pm": [
+  {
+   "stationId": "123000611",
+   "name": "잠실광역환승센터",
+   "avgBoard": 9013
+  },
+  {
+   "stationId": "119000302",
+   "name": "사당역9번출구앞",
+   "avgBoard": 2274
+  },
+  {
+   "stationId": "101000148",
+   "name": "명동입구",
+   "avgBoard": 2072
+  },
+  {
+   "stationId": "120000677",
+   "name": "사당역4번출구B",
+   "avgBoard": 1663
+  },
+  {
+   "stationId": "120000059",
+   "name": "사당역4번출구",
+   "avgBoard": 1636
+  },
+  {
+   "stationId": "118000620",
+   "name": "당산역광역환승센터(1번승강장)",
+   "avgBoard": 1588
+  },
+  {
+   "stationId": "121000946",
+   "name": "신논현역.금강빌딩",
+   "avgBoard": 1518
+  },
+  {
+   "stationId": "121000009",
+   "name": "신분당선강남역(중)",
+   "avgBoard": 1513
+  },
+  {
+   "stationId": "122000616",
+   "name": "신논현역",
+   "avgBoard": 1402
+  },
+  {
+   "stationId": "120000676",
+   "name": "사당역4번출구A",
+   "avgBoard": 1327
+  },
+  {
+   "stationId": "121000010",
+   "name": "신분당선강남역(중)",
+   "avgBoard": 1310
+  },
+  {
+   "stationId": "101000128",
+   "name": "신한은행본점",
+   "avgBoard": 1282
+  },
+  {
+   "stationId": "121001325",
+   "name": "사당역14번출구",
+   "avgBoard": 1237
+  },
+  {
+   "stationId": "101000006",
+   "name": "서울역버스환승센터(6번승강장)(중)",
+   "avgBoard": 1148
+  },
+  {
+   "stationId": "101000001",
+   "name": "남대문세무서(중)",
+   "avgBoard": 1125
+  },
+  {
+   "stationId": "123000511",
+   "name": "잠실역",
+   "avgBoard": 1075
+  },
+  {
+   "stationId": "101000005",
+   "name": "서울역버스환승센터(5번승강장)(중)",
+   "avgBoard": 1014
+  },
+  {
+   "stationId": "121000220",
+   "name": "매헌시민의숲.양재꽃시장",
+   "avgBoard": 964
+  },
+  {
+   "stationId": "101000333",
+   "name": "광교",
+   "avgBoard": 957
+  },
+  {
+   "stationId": "121000921",
+   "name": "강남역나라빌딩앞",
+   "avgBoard": 941
+  },
+  {
+   "stationId": "101000026",
+   "name": "숭례문",
+   "avgBoard": 885
+  },
+  {
+   "stationId": "121000947",
+   "name": "신논현역.유화빌딩",
+   "avgBoard": 883
+  },
+  {
+   "stationId": "100000034",
+   "name": "광화문역6번출구.광화문빌딩",
+   "avgBoard": 864
+  },
+  {
+   "stationId": "121000944",
+   "name": "신논현역.주류성빌딩",
+   "avgBoard": 706
+  },
+  {
+   "stationId": "104000069",
+   "name": "테크노마트앞.강변역(D)",
+   "avgBoard": 653
+  },
+  {
+   "stationId": "113000414",
+   "name": "홍대입구역(중)",
+   "avgBoard": 642
+  },
+  {
+   "stationId": "121000974",
+   "name": "강남역우리은행",
+   "avgBoard": 632
+  },
+  {
+   "stationId": "121000003",
+   "name": "양재역.서초문화예술회관(중)",
+   "avgBoard": 622
+  },
+  {
+   "stationId": "121000942",
+   "name": "신논현역.인터파크",
+   "avgBoard": 617
+  },
+  {
+   "stationId": "123000002",
+   "name": "잠실역.잠실대교남단(중)",
+   "avgBoard": 592
+  },
+  {
+   "stationId": "121000973",
+   "name": "강남역티월드",
+   "avgBoard": 538
+  },
+  {
+   "stationId": "102000070",
+   "name": "순천향대학병원",
+   "avgBoard": 502
+  },
+  {
+   "stationId": "101000337",
+   "name": "명동성당",
+   "avgBoard": 498
+  },
+  {
+   "stationId": "121000166",
+   "name": "사당역3번출구",
+   "avgBoard": 490
+  },
+  {
+   "stationId": "121000005",
+   "name": "뱅뱅사거리(중)",
+   "avgBoard": 475
+  },
+  {
+   "stationId": "118000090",
+   "name": "당산역.삼성래미안아파트",
+   "avgBoard": 438
+  },
+  {
+   "stationId": "113000468",
+   "name": "합정역",
+   "avgBoard": 430
+  },
+  {
+   "stationId": "118000524",
+   "name": "CM병원",
+   "avgBoard": 411
+  },
+  {
+   "stationId": "121000007",
+   "name": "래미안아파트.파이낸셜뉴스(중)",
+   "avgBoard": 408
+  },
+  {
+   "stationId": "121000971",
+   "name": "양재역커피빈앞",
+   "avgBoard": 397
+  },
+  {
+   "stationId": "121000929",
+   "name": "교대역",
+   "avgBoard": 391
+  },
+  {
+   "stationId": "121000008",
+   "name": "래미안아파트.파이낸셜뉴스(중)",
+   "avgBoard": 391
+  },
+  {
+   "stationId": "121000970",
+   "name": "양재역9번출구",
+   "avgBoard": 386
+  },
+  {
+   "stationId": "112000013",
+   "name": "연세대앞(중)",
+   "avgBoard": 385
+  },
+  {
+   "stationId": "101000303",
+   "name": "서울시청",
+   "avgBoard": 350
+  },
+  {
+   "stationId": "121000086",
+   "name": "KCC사옥",
+   "avgBoard": 344
+  },
+  {
+   "stationId": "121000060",
+   "name": "서초역1번출구",
+   "avgBoard": 341
+  },
+  {
+   "stationId": "113000416",
+   "name": "신촌오거리.현대백화점(중)",
+   "avgBoard": 339
+  },
+  {
+   "stationId": "121000012",
+   "name": "지하철2호선강남역(중)",
+   "avgBoard": 338
+  },
+  {
+   "stationId": "100000174",
+   "name": "세종문화회관",
+   "avgBoard": 330
+  },
+  {
+   "stationId": "121000969",
+   "name": "양재역엘타워빌딩",
+   "avgBoard": 322
+  },
+  {
+   "stationId": "121000920",
+   "name": "래미안아파트.파이낸셜뉴스",
+   "avgBoard": 290
+  },
+  {
+   "stationId": "117000310",
+   "name": "석수역(중)",
+   "avgBoard": 288
+  },
+  {
+   "stationId": "101000022",
+   "name": "숭례문",
+   "avgBoard": 283
+  },
+  {
+   "stationId": "119900083",
+   "name": "사당역10번출구",
+   "avgBoard": 281
+  }
+ ]
+}

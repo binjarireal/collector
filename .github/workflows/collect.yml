@@ -1,0 +1,70 @@
+# 평일 출퇴근 광역버스 남은 좌석 수집 — 3분 간격
+#  · routes: 버스위치(노선 단위) active.json 96개 노선, 출근 06:00~09:00 + 퇴근 17:30~19:30 (하루 약 9,792회 / 한도 1만)
+#  · stops : 버스도착정보(정류장 단위) stops.json 출근 경기 125곳 06:00~09:00, 퇴근 서울 55곳 17:30~19:30 (하루 약 9,880회 / 한도 1만)
+# 수집 기록은 이 공개 저장소가 아니라 비공개 저장소(hustleraccoon/bus-empty-seats, collected/)에 저장한다.
+# 예약 실행이 늦게 뜰 때를 대비해 일찍 띄움(05:00, 16:30 KST). 공개 저장소라 실행 시간 제한 없음.
+# 기록이 0줄이거나 예상 회차의 절반도 못 돌면 실패로 표시되어 GitHub 알림이 간다.
+name: collect
+
+on:
+  schedule:
+    - cron: "0 20 * * 0-4"    # UTC 일~목 20:00 = KST 월~금 05:00 (출근)
+    - cron: "30 7 * * 1-5"    # UTC 월~금 07:30 = KST 월~금 16:30 (퇴근)
+  workflow_dispatch:
+    inputs:
+      minutes:
+        description: "시험: 지금 바로 몇 분 수집"
+        default: "3"
+      limit:
+        description: "시험: 노선·정류장 몇 개만"
+        default: "10"
+
+permissions:
+  contents: read
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    strategy:
+      fail-fast: false
+      matrix:
+        kind: [routes, stops]
+    env:
+      TZ: Asia/Seoul
+      DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: 비공개 저장소 연결 (collected/ 폴더만)
+        run: |
+          mkdir -p ~/.ssh && echo "${{ secrets.DATA_REPO_KEY }}" > ~/.ssh/data_key && chmod 600 ~/.ssh/data_key
+          ssh-keyscan github.com >> ~/.ssh/known_hosts 2>/dev/null
+          export GIT_SSH_COMMAND="ssh -i ~/.ssh/data_key -o IdentitiesOnly=yes"
+          git clone --depth 1 --filter=blob:none --sparse git@github.com:hustleraccoon/bus-empty-seats.git store
+          cd store && git sparse-checkout set collected && cd ..
+          mkdir -p data store/collected
+          cp store/collected/$(date +%Y%m%d)_calls*.json data/ 2>/dev/null || true   # 오늘 이미 쓴 호출 수 이어받기
+      - name: 수집
+        run: |
+          AM="${{ github.event.schedule == '0 20 * * 0-4' }}"
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            ARGS="--start now --minutes ${{ inputs.minutes }} --limit ${{ inputs.limit }}"; SET=am
+          elif [ "$AM" = "true" ]; then ARGS="--start 06:00 --end 09:00"; SET=am
+          else ARGS="--start 17:30 --end 19:30"; SET=pm; fi
+          if [ "${{ matrix.kind }}" = "routes" ]; then python collect.py $ARGS
+          else python collect_stops.py --set $SET $ARGS; fi
+      - name: 비공개 저장소에 저장
+        if: always()
+        run: |
+          export GIT_SSH_COMMAND="ssh -i ~/.ssh/data_key -o IdentitiesOnly=yes"
+          cp data/* store/collected/ 2>/dev/null || true
+          cd store
+          git config user.name "collect-bot"
+          git config user.email "collect-bot@users.noreply.github.com"
+          git add collected
+          git diff --cached --quiet && echo "새 기록 없음" && exit 0
+          git commit -m "수집(${{ matrix.kind }}) $(date +%Y-%m-%d\ %H:%M)"
+          for i in 1 2 3 4 5; do git pull --rebase && git push && break; sleep $((RANDOM % 10 + 5)); done
