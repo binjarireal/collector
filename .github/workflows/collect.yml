@@ -1,9 +1,11 @@
 # 평일 출퇴근 광역버스 남은 좌석 수집 — 3분 간격
-#  · routes: 버스위치(노선 단위) active.json 96개 노선, 출근 06:00~09:00 + 퇴근 17:30~19:30 (하루 약 9,792회 / 한도 1만)
+#  · routes: 버스위치(노선 단위) active.json 98개 노선, 출근 06:00~09:00 + 퇴근 17:30~19:30 (하루 약 9,800회 / 한도 1만)
 #  · stops : 버스도착정보(정류장 단위) stops.json 출근 경기 125곳 06:00~09:00, 퇴근 서울 55곳 17:30~19:30 (하루 약 9,880회 / 한도 1만)
 # 수집 기록은 이 공개 저장소가 아니라 비공개 저장소(hustleraccoon/bus-empty-seats, collected/)에 저장한다.
 # 예약 실행이 늦게 뜰 때를 대비해 일찍 띄움(05:00, 16:30 KST). 공개 저장소라 실행 시간 제한 없음.
 # 기록이 0줄이거나 예상 회차의 절반도 못 돌면 실패로 표시되어 GitHub 알림이 간다.
+# 자동 다시 시작: 시작 10분 전 시험 조회가 실패하거나 수집 중 약 12분 동안 전부 실패하면(종료 코드 3)
+#   그때까지 기록을 저장하고 새 실행 컴퓨터(다른 인터넷 주소)를 띄워 같은 파일에 이어 쓴다. 최대 5번.
 name: collect
 
 on:
@@ -18,9 +20,28 @@ on:
       limit:
         description: "시험: 노선·정류장 몇 개만"
         default: "10"
+      kinds:
+        description: "(자동 다시 시작용) 수집 종류 목록"
+        default: '["routes","stops"]'
+      set:
+        description: "(자동 다시 시작용) am 또는 pm"
+        default: ""
+      start:
+        description: "(자동 다시 시작용) 원래 시작 시각"
+        default: ""
+      end:
+        description: "(자동 다시 시작용) 끝 시각"
+        default: ""
+      tag:
+        description: "(자동 다시 시작용) 이어 쓸 파일 이름의 시각 (예: 0600). 비우면 시험 실행"
+        default: ""
+      attempt:
+        description: "(자동 다시 시작용) 몇 번째 다시 시작인지"
+        default: "0"
 
 permissions:
   contents: read
+  actions: write   # 실패 시 같은 수집을 새로 띄우기 위해
 
 jobs:
   collect:
@@ -29,7 +50,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        kind: [routes, stops]
+        kind: ${{ fromJSON(github.event.inputs.kinds || '["routes","stops"]') }}
     env:
       TZ: Asia/Seoul
       DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
@@ -46,16 +67,29 @@ jobs:
           git clone --depth 1 --filter=blob:none --sparse git@github.com:hustleraccoon/bus-empty-seats.git store
           cd store && git sparse-checkout set collected && cd ..
           mkdir -p data store/collected
-          cp store/collected/$(date +%Y%m%d)_calls*.json data/ 2>/dev/null || true   # 오늘 이미 쓴 호출 수 이어받기
+          # 오늘 이미 쓴 호출 수 이어받기 + 다시 시작한 실행이면 앞 실행이 남긴 기록 파일에 이어 쓰기
+          cp store/collected/$(date +%Y%m%d)_* data/ 2>/dev/null || true
       - name: 수집
+        id: run
         run: |
-          AM="${{ github.event.schedule == '0 20 * * 0-4' }}"
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            ARGS="--start now --minutes ${{ inputs.minutes }} --limit ${{ inputs.limit }}"; SET=am
-          elif [ "$AM" = "true" ]; then ARGS="--start 06:00 --end 09:00"; SET=am
-          else ARGS="--start 17:30 --end 19:30"; SET=pm; fi
-          if [ "${{ matrix.kind }}" = "routes" ]; then python collect.py $ARGS
-          else python collect_stops.py --set $SET $ARGS; fi
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "${{ inputs.tag }}" ]; then
+            SET="${{ inputs.set }}"; START="${{ inputs.start }}"; END="${{ inputs.end }}"; TAG="${{ inputs.tag }}"
+            echo "다시 시작 ${{ inputs.attempt }}번째: $START~$END, 파일 $TAG"
+          elif [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            SET=am; START=""; TAG=""
+          elif [ "${{ github.event.schedule }}" = "0 20 * * 0-4" ]; then
+            SET=am; START=06:00; END=09:00; TAG=0600
+          else
+            SET=pm; START=17:30; END=19:30; TAG=1730
+          fi
+          if [ -n "$TAG" ]; then ARGS="--start $START --end $END --tag $TAG"
+          else ARGS="--start now --minutes ${{ inputs.minutes }} --limit ${{ inputs.limit }}"; fi
+          { echo "set=$SET"; echo "start=$START"; echo "end=$END"; echo "tag=$TAG"; } >> "$GITHUB_OUTPUT"
+          rc=0
+          if [ "${{ matrix.kind }}" = "routes" ]; then python collect.py $ARGS || rc=$?
+          else python collect_stops.py --set $SET $ARGS || rc=$?; fi
+          if [ "$rc" = "3" ]; then echo "restart=1" >> "$GITHUB_OUTPUT"; exit 0; fi
+          exit $rc
       - name: 비공개 저장소에 저장
         if: always()
         run: |
@@ -68,3 +102,15 @@ jobs:
           git diff --cached --quiet && echo "새 기록 없음" && exit 0
           git commit -m "수집(${{ matrix.kind }}) $(date +%Y-%m-%d\ %H:%M)"
           for i in 1 2 3 4 5; do git pull --rebase && git push && break; sleep $((RANDOM % 10 + 5)); done
+      - name: 새 실행 컴퓨터로 다시 시작
+        if: steps.run.outputs.restart == '1'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          N=$(( ${{ inputs.attempt || '0' }} + 1 ))
+          if [ "$N" -gt 5 ]; then echo "다시 시작 5번 모두 실패 → 포기 (알림)"; exit 1; fi
+          gh workflow run collect.yml --repo "${{ github.repository }}" --ref "${{ github.ref_name }}" \
+            -f kinds='["${{ matrix.kind }}"]' -f set="${{ steps.run.outputs.set }}" \
+            -f start="${{ steps.run.outputs.start }}" -f end="${{ steps.run.outputs.end }}" \
+            -f tag="${{ steps.run.outputs.tag }}" -f attempt="$N"
+          echo "${N}번째 다시 시작을 요청함"

@@ -8,6 +8,8 @@
   python collect.py --start now --minutes 3                  # 지금 바로 3분 시험
 키: 환경변수 DATA_GO_KR_KEY (인코딩 키면 그대로, 디코딩 키면 주소용으로 바꿔 씀)
 저장: data/YYYYMMDD_<시작시각>.csv.gz   한도 관리: data/YYYYMMDD_calls.json
+실패 대비(guard.py): 시작 10분 전 시험 조회가 실패하거나, 수집 중 약 12분 동안 전부 실패하면
+  종료 코드 3으로 끝내 GitHub Actions가 새 실행 컴퓨터에서 이어 받게 한다. 실패 이유는 *_errors.json
 """
 import argparse
 import csv
@@ -23,6 +25,8 @@ import urllib.request
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta
 from pathlib import Path
+
+import guard
 
 ROOT = Path(__file__).resolve().parent
 DATA = ROOT / "data"
@@ -41,13 +45,7 @@ class AuthError(Exception):
 
 
 def fetch(key_q, route_id):
-    url = f"{URL}?serviceKey={key_q}&routeId={route_id}&format=json"
-    try:
-        with urllib.request.urlopen(url, timeout=20) as r:
-            body = r.read().decode("utf-8")
-    except urllib.error.HTTPError as e:
-        body = e.read().decode("utf-8", "replace")
-    data = json.loads(body)
+    data = guard.parse_json(*guard.get_text(f"{URL}?serviceKey={key_q}&routeId={route_id}&format=json"))
     if "OpenAPI_ServiceResponse" in data:
         h = data["OpenAPI_ServiceResponse"]["cmmMsgHeader"]
         raise AuthError(f"{h.get('returnAuthMsg')} ({h.get('errMsg')})")
@@ -84,7 +82,9 @@ def main():
     ap.add_argument("--budget", type=int, default=9950, help="버스위치 하루 호출 상한 (한도 1만)")
     ap.add_argument("--workers", type=int, default=16, help="동시에 부르는 수")
     ap.add_argument("--limit", type=int, help="앞에서부터 노선 몇 개만(시험용)")
+    ap.add_argument("--tag", help="저장 파일 이름의 시각 부분(다시 시작한 실행이 원래 파일에 이어 쓰도록, 예: 0600)")
     a = ap.parse_args()
+    real = a.minutes is None  # --minutes 가 없으면 정규 수집 (시험이 아님)
 
     key = os.environ.get("DATA_GO_KR_KEY", "").strip()
     if not key:
@@ -101,7 +101,7 @@ def main():
     if now.weekday() >= 5 and a.start != "now":
         log("주말이라 수집하지 않음"); return
     start = now if a.start == "now" else parse_hm(a.start, now.date())
-    end = start + timedelta(minutes=a.minutes or 3) if a.start == "now" else parse_hm(a.end, now.date())
+    end = start + timedelta(minutes=a.minutes) if a.minutes else parse_hm(a.end, now.date())
     if datetime.now() > end:
         log("수집 시간이 이미 지남"); return
     DATA.mkdir(exist_ok=True)
@@ -109,18 +109,37 @@ def main():
     calls = Calls(day)
     need = len(routes) * int((end - start).total_seconds() // a.every + 1)
     log(f"{day} {start:%H:%M}~{end:%H:%M}, {a.every}초 간격, 노선 {len(routes)}개 → 예상 {need:,}회 (오늘 이미 {calls.n:,}회, 상한 {a.budget:,})")
+    tag = a.tag or f"{start:%H%M}"
+    errors = guard.Errors(DATA / f"{day}_{tag}_errors.json")
+    probe_at = start - timedelta(minutes=10)
+    if real and datetime.now() < probe_at:
+        while datetime.now() < probe_at:
+            time.sleep(min(30, max(1, (probe_at - datetime.now()).total_seconds())))
+        try:  # 시작 10분 전 시험 조회 1번 — 이 실행 컴퓨터에서 API가 되는지 미리 확인
+            fetch(key_q, routes[0]["routeId"])
+            calls.add(1)
+            log("시험 조회 성공")
+        except AuthError as e:
+            log(f"시험 조회: 인증 오류 {e} (다시 시작해도 소용없어 그대로 진행)")
+        except Exception as e:
+            calls.add(1)
+            errors.add(f"시험 조회: {e}"); errors.save()
+            log(f"시험 조회 실패: {e} → 새 실행 컴퓨터로 다시 시작 요청")
+            sys.exit(guard.RESTART)
     while datetime.now() < start:
         time.sleep(min(30, max(1, (start - datetime.now()).total_seconds())))
 
-    out = DATA / f"{day}_{start:%H%M}.csv.gz"
+    out = DATA / f"{day}_{tag}.csv.gz"
+    new = not out.exists() or out.stat().st_size == 0
     f = gzip.open(out, "at", encoding="utf-8", newline="")
     w = csv.DictWriter(f, fieldnames=FIELDS)
-    if out.stat().st_size == 0 or f.tell() == 0:
+    if new:
         w.writeheader()
     wlock = threading.Lock()
     polls = rows = fails = 0
     dead_since = None
-    nxt = datetime.now()
+    dead_polls = 0
+    nxt = t0 = datetime.now()
     with ThreadPoolExecutor(a.workers) as pool:
         while datetime.now() <= end:
             if calls.n + len(routes) > a.budget:
@@ -133,6 +152,7 @@ def main():
                 except AuthError:
                     raise
                 except Exception as e:  # 시간 초과 등은 이번 회차만 건너뜀
+                    errors.add(e)
                     return r, None, e
 
             try:
@@ -151,16 +171,24 @@ def main():
                         w.writerow({"ts": ts, **{k: b.get(k, "") for k in FIELDS if k != "ts"}})
                         rows += 1
             f.flush()
+            errors.save()
             polls += 1
             if ok == 0:
                 dead_since = dead_since or datetime.now()
-                # 공개 저장소라 실행 시간 제한이 없으니 멈추지 않고 다음 회차에 계속 시도
+                dead_polls += 1
+                left = (end - datetime.now()).total_seconds() / 60
+                if real and dead_polls >= guard.FAIL_POLLS and left >= guard.MIN_LEFT_MIN:
+                    log(f"모든 노선 조회 {dead_polls}회 연속 실패 ({errors.top()}) → 새 실행 컴퓨터로 다시 시작 요청")
+                    f.close()
+                    sys.exit(guard.RESTART)
+                # 남은 시간이 짧으면 멈추지 않고 다음 회차에 계속 시도
                 if polls % 5 == 0:
-                    log(f"모든 노선 조회 실패 {int((datetime.now() - dead_since).total_seconds() // 60)}분째 — 계속 시도")
+                    log(f"모든 노선 조회 실패 {int((datetime.now() - dead_since).total_seconds() // 60)}분째 — 계속 시도. 주된 이유: {errors.top()}")
             else:
                 if dead_since:
                     log(f"복구됨 (실패 {int((datetime.now() - dead_since).total_seconds() // 60)}분)")
                 dead_since = None
+                dead_polls = 0
             took = (datetime.now() - datetime.strptime(ts, "%Y-%m-%d %H:%M:%S")).total_seconds()
             if polls % 10 == 0 or polls == 1:
                 log(f"{polls}회째: 성공 {ok}/{len(routes)}개 노선, 누적 {rows:,}줄, {took:.0f}초 걸림, 오늘 호출 {calls.n:,}회")
@@ -169,9 +197,11 @@ def main():
                 nxt = datetime.now()
             time.sleep(max(0, (nxt - datetime.now()).total_seconds()))
     log(f"끝: {polls}회 조회, {rows:,}줄, 실패 {fails}건 → {out.name}, 오늘 호출 {calls.n:,}회")
+    if errors.d:
+        log(f"실패 이유 → {errors.path.name}: {errors.top(5)}")
     f.close()
-    expected = int((end - start).total_seconds() // a.every + 1)
-    if a.start != "now" and (rows == 0 or polls < expected * 0.5):
+    expected = int((end - t0).total_seconds() // a.every + 1)  # 다시 시작한 실행은 늦게 시작하므로 실제 시작 시각 기준
+    if real and (rows == 0 or polls < expected * 0.5):
         log(f"⚠️ 수집 부족: {polls}/{expected}회 조회, {rows:,}줄 → 실패로 표시(알림)")
         sys.exit(2)
 
