@@ -53,6 +53,13 @@ def fetch(key_q, station_id):
     return items if isinstance(items, list) else [items]
 
 
+def bad_item(it):
+    """응답 형태가 이상한지: 버스가 있는데 차량 번호가 숫자가 아니거나 남은 시간이 비었으면 이상.
+    (2026-10-23 퇴근·10-26 출근에 서버가 vehId1='N', predictTimeSec 없음으로 답해 기록 전체를 못 씀)"""
+    v = str(it.get("vehId1") or "")
+    return bool(v) and (not v.isdigit() or str(it.get("predictTimeSec1") or "") == "")
+
+
 def parse_hm(s, day):
     h, m = map(int, s.split(":"))
     return datetime.combine(day, datetime.min.time()).replace(hour=h, minute=m)
@@ -123,6 +130,8 @@ def main():
     if new:
         w.writeheader()
     polls = rows = fails = 0
+    bus_rows = bad_rows = 0  # 버스가 있는 줄 / 그중 형태가 이상한 줄
+    sample = DATA / f"{day}_{tag}_stops_sample.json"  # 이상할 때 서버 원래 답 한 개 (원인 확인용)
     dead_since = None
     dead_polls = 0
     nxt = t0 = datetime.now()
@@ -148,6 +157,8 @@ def main():
             calls += len(stops)
             save_calls()
             ok = 0
+            p_bus = p_bad = 0
+            p_sample = None
             for s, items, err in res:
                 if err is not None:
                     fails += 1
@@ -158,6 +169,17 @@ def main():
                         continue  # 좌석형 광역버스만
                     w.writerow({"ts": ts, "stationId": s["stationId"], **{k: it.get(k, "") for k in FIELDS[2:]}})
                     rows += 1
+                    if it.get("vehId1"):
+                        p_bus += 1
+                        if bad_item(it):
+                            p_bad += 1
+                            p_sample = p_sample or {"ts": ts, "stationId": s["stationId"], "items": items[:5]}
+            bus_rows += p_bus
+            bad_rows += p_bad
+            # 먼 버스는 원래 가끔 남은 시간이 비므로, 한 회차의 절반 넘게 이상할 때만 경고
+            if p_bus and p_bad / p_bus >= 0.5 and not sample.exists():
+                sample.write_text(json.dumps(p_sample, ensure_ascii=False, indent=1), encoding="utf-8")
+                log(f"⚠️ 서버 답 형태 이상 {p_bad}/{p_bus}줄(차량 번호·남은 시간) → 원래 답 저장: {sample.name}")
             f.flush()
             errors.save()
             polls += 1
@@ -188,9 +210,15 @@ def main():
     if errors.d:
         log(f"실패 이유 → {errors.path.name}: {errors.top(5)}")
     f.close()
+    bad = bad_rows / bus_rows if bus_rows else 0
+    if bad >= 0.01:
+        log(f"형태 이상 줄: {bad_rows:,}/{bus_rows:,} ({bad:.0%})")
     expected = int((end - t0).total_seconds() // a.every + 1)  # 다시 시작한 실행은 늦게 시작하므로 실제 시작 시각 기준
     if real and (rows == 0 or polls < expected * 0.5):
         log(f"⚠️ 수집 부족: {polls}/{expected}회 조회, {rows:,}줄 → 실패로 표시(알림)")
+        sys.exit(2)
+    if real and bad >= 0.5:
+        log(f"⚠️ 기록 절반 이상이 쓸 수 없는 형태 → 실패로 표시(알림). 원래 답: {sample.name}")
         sys.exit(2)
 
 
