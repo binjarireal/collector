@@ -93,7 +93,13 @@ def main():
     routes = json.loads((ROOT / "routes.json").read_text(encoding="utf-8"))["routes"]
     active = ROOT / "active.json"  # 있으면 그 노선만 (하루 한도에 맞춘 우선 노선)
     if active.exists():
-        ids = set(json.loads(active.read_text(encoding="utf-8"))["routeIds"])
+        act = json.loads(active.read_text(encoding="utf-8"))
+        if "groups" in act:  # 묶음을 평일마다 번갈아: 날짜 일련번호로 고름 (다시 시작한 실행도 같은 날이면 같은 묶음)
+            gi = datetime.now().date().toordinal() % len(act["groups"])
+            ids = set(act["groups"][gi])
+            log(f"오늘 노선 묶음: {'AB'[gi] if len(act['groups']) == 2 else gi} ({len(ids)}개)")
+        else:
+            ids = set(act["routeIds"])
         routes = [r for r in routes if r["routeId"] in ids]
     routes = routes[: a.limit]
 
